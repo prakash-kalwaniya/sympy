@@ -14,6 +14,7 @@ from sympy.functions.elementary.trigonometric import (cos, sin, atan)
 from sympy.functions.special.error_functions import (Ei, erf, erfc)
 from sympy.functions.special.gamma_functions import (digamma, gamma, loggamma, lowergamma, multigamma, polygamma, trigamma, uppergamma)
 from sympy.functions.special.zeta_functions import zeta
+from sympy.series.limits import limit
 from sympy.series.order import O
 
 from sympy.core.expr import unchanged
@@ -634,6 +635,12 @@ def test_polygamma_expansion():
 def test_polygamma_leading_term():
     expr = -log(1/x) + polygamma(0, 1 + 1/x) + S.EulerGamma
     assert expr.as_leading_term(x, logx=-y) == S.EulerGamma
+    # poles at z=0: polygamma(n, z) ~ (-1)^(n+1) * n! / z^(n+1)
+    assert limit(polygamma(1, x), x, 0, '+') == oo
+    assert limit(polygamma(2, x), x, 0, '+') == -oo
+    assert limit(polygamma(3, x), x, 0, '+') == oo
+    assert polygamma(1, x).as_leading_term(x) == 1/x**2
+    assert polygamma(2, x).as_leading_term(x) == -2/x**3
 
 
 def test_issue_8657():
